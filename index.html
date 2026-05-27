@@ -1,0 +1,593 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MLBB Stats Tracker</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Exo+2:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  background: #070b14;
+  min-height: 100vh;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 32px 16px;
+  font-family: 'Exo 2', sans-serif;
+}
+.mlbb-root {
+  background: #0a0e1a;
+  width: 100%;
+  max-width: 480px;
+  border-radius: 20px;
+  overflow: hidden;
+  position: relative;
+  border: 1px solid rgba(139,100,255,0.2);
+  box-shadow: 0 0 60px rgba(107,63,255,0.12);
+}
+.mlbb-bg {
+  position: absolute; inset: 0;
+  background: radial-gradient(ellipse at 70% 0%, rgba(91,60,180,0.18) 0%, transparent 60%),
+              radial-gradient(ellipse at 20% 80%, rgba(0,200,180,0.08) 0%, transparent 50%);
+  pointer-events: none;
+}
+.mlbb-header {
+  padding: 20px 24px 16px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border-bottom: 1px solid rgba(139,100,255,0.15);
+  position: relative;
+}
+.mlbb-logo {
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 20px;
+  font-weight: 700;
+  color: #c4a8ff;
+  letter-spacing: 1px;
+}
+.mlbb-logo span { color: #00e5c8; }
+.mlbb-badge {
+  font-size: 10px;
+  background: rgba(0,229,200,0.12);
+  border: 1px solid rgba(0,229,200,0.3);
+  color: #00e5c8;
+  padding: 2px 8px;
+  border-radius: 20px;
+  letter-spacing: 0.5px;
+}
+.mlbb-body { padding: 20px 24px; position: relative; }
+
+.step-bar { display: flex; gap: 8px; margin-bottom: 20px; }
+.step-dot { width: 8px; height: 8px; border-radius: 50%; background: rgba(255,255,255,0.15); transition: background 0.3s; }
+.step-dot.active { background: #c4a8ff; }
+.step-dot.done { background: #00e5c8; }
+
+.form-group { margin-bottom: 14px; }
+.form-label { font-size: 11px; color: rgba(200,180,255,0.6); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 6px; display: block; }
+.mlbb-input {
+  width: 100%;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(139,100,255,0.25);
+  border-radius: 10px;
+  padding: 10px 14px;
+  color: #e8e0ff;
+  font-family: 'Exo 2', sans-serif;
+  font-size: 14px;
+  outline: none;
+  transition: border-color 0.2s;
+}
+.mlbb-input:focus { border-color: rgba(196,168,255,0.6); }
+.mlbb-input::placeholder { color: rgba(200,180,255,0.3); }
+
+.mlbb-btn {
+  width: 100%;
+  padding: 12px;
+  background: linear-gradient(135deg, #6b3fff 0%, #4a1fff 100%);
+  border: none;
+  border-radius: 10px;
+  color: #fff;
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 16px;
+  font-weight: 600;
+  letter-spacing: 1px;
+  cursor: pointer;
+  transition: opacity 0.2s, transform 0.1s;
+  margin-top: 6px;
+}
+.mlbb-btn:hover { opacity: 0.88; }
+.mlbb-btn:active { transform: scale(0.98); }
+.mlbb-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+.mlbb-btn-outline {
+  background: transparent;
+  border: 1px solid rgba(196,168,255,0.4);
+  color: #c4a8ff;
+}
+.mlbb-btn-outline:hover { background: rgba(196,168,255,0.08); }
+.mlbb-btn-sm { width: auto; padding: 8px 18px; font-size: 13px; }
+
+.info-box {
+  background: rgba(0,229,200,0.06);
+  border: 1px solid rgba(0,229,200,0.2);
+  border-radius: 10px;
+  padding: 12px 14px;
+  font-size: 13px;
+  color: rgba(200,240,235,0.8);
+  line-height: 1.6;
+  margin-bottom: 14px;
+}
+.warn-box {
+  background: rgba(255,180,0,0.07);
+  border: 1px solid rgba(255,180,0,0.25);
+  border-radius: 10px;
+  padding: 12px 14px;
+  font-size: 13px;
+  color: rgba(255,220,140,0.9);
+  line-height: 1.6;
+  margin-bottom: 14px;
+}
+.err-box {
+  background: rgba(255,60,60,0.08);
+  border: 1px solid rgba(255,80,80,0.3);
+  border-radius: 10px;
+  padding: 12px 14px;
+  font-size: 13px;
+  color: rgba(255,180,180,0.9);
+  margin-bottom: 14px;
+  display: none;
+}
+
+.player-card {
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(139,100,255,0.2);
+  border-radius: 14px;
+  padding: 16px;
+  margin-bottom: 14px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+.player-avatar {
+  width: 52px; height: 52px;
+  border-radius: 50%;
+  border: 2px solid #6b3fff;
+  background: rgba(107,63,255,0.2);
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 22px; font-weight: 700;
+  color: #c4a8ff;
+  flex-shrink: 0;
+}
+.player-name { font-family: 'Rajdhani', sans-serif; font-size: 18px; font-weight: 700; color: #e8e0ff; }
+.player-id { font-size: 12px; color: rgba(200,180,255,0.5); }
+.rank-badge {
+  margin-left: auto;
+  background: linear-gradient(135deg, rgba(255,190,0,0.15), rgba(255,140,0,0.1));
+  border: 1px solid rgba(255,190,0,0.35);
+  border-radius: 8px;
+  padding: 6px 12px;
+  text-align: center;
+  flex-shrink: 0;
+}
+.rank-label { font-size: 10px; color: rgba(255,200,100,0.7); display: block; letter-spacing: 0.5px; }
+.rank-name { font-family: 'Rajdhani', sans-serif; font-size: 15px; font-weight: 700; color: #ffd060; display: block; }
+
+.stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 14px; }
+.stat-card {
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(139,100,255,0.15);
+  border-radius: 12px;
+  padding: 12px;
+  text-align: center;
+}
+.stat-val { font-family: 'Rajdhani', sans-serif; font-size: 22px; font-weight: 700; color: #c4a8ff; display: block; }
+.stat-val.green { color: #00e5c8; }
+.stat-val.amber { color: #ffc850; }
+.stat-lbl { font-size: 10px; color: rgba(200,180,255,0.5); text-transform: uppercase; letter-spacing: 0.5px; }
+
+.section-title {
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 13px; font-weight: 600;
+  color: rgba(196,168,255,0.6);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin: 16px 0 8px;
+}
+
+.match-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(139,100,255,0.1);
+  border-radius: 10px;
+  padding: 10px 12px;
+  margin-bottom: 8px;
+  font-size: 13px;
+  transition: background 0.15s;
+}
+.match-row:hover { background: rgba(107,63,255,0.08); }
+.match-hero-icon {
+  width: 36px; height: 36px;
+  border-radius: 8px;
+  background: rgba(107,63,255,0.25);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 18px;
+  flex-shrink: 0;
+}
+.match-hero-name { font-weight: 500; color: #e0d8ff; font-size: 13px; }
+.match-kda { color: rgba(200,180,255,0.6); font-size: 12px; }
+.match-score { margin-left: auto; font-family: 'Rajdhani', sans-serif; font-size: 15px; font-weight: 600; color: #c4a8ff; flex-shrink: 0; }
+.win-badge { font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 6px; flex-shrink: 0; }
+.win-badge.win { background: rgba(0,229,200,0.15); color: #00e5c8; border: 1px solid rgba(0,229,200,0.3); }
+.win-badge.lose { background: rgba(255,70,70,0.12); color: #ff7070; border: 1px solid rgba(255,70,70,0.3); }
+.match-date { font-size: 11px; color: rgba(200,180,255,0.4); flex-shrink: 0; }
+
+.spinner { display: inline-block; width: 16px; height: 16px; border: 2px solid rgba(255,255,255,0.3); border-top-color: #fff; border-radius: 50%; animation: spin 0.8s linear infinite; vertical-align: middle; margin-right: 8px; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.vc-input-row .mlbb-input { letter-spacing: 6px; font-size: 22px; text-align: center; font-family: 'Rajdhani', sans-serif; font-weight: 700; }
+.timer-text { font-size: 12px; color: rgba(255,200,100,0.7); text-align: center; margin-top: 6px; }
+
+.tab-bar { display: flex; gap: 6px; margin-bottom: 14px; }
+.tab-btn {
+  flex: 1;
+  padding: 7px;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(139,100,255,0.15);
+  border-radius: 8px;
+  color: rgba(200,180,255,0.5);
+  font-family: 'Exo 2', sans-serif;
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-align: center;
+}
+.tab-btn.active { background: rgba(107,63,255,0.2); border-color: rgba(196,168,255,0.4); color: #c4a8ff; }
+.tab-content { display: none; }
+.tab-content.active { display: block; }
+
+.signout-btn { font-size: 12px; color: rgba(255,100,100,0.7); background: none; border: none; cursor: pointer; float: right; margin-top: 2px; padding: 0; font-family: 'Exo 2', sans-serif; }
+.signout-btn:hover { color: #ff7070; }
+.divider { border: none; border-top: 1px solid rgba(139,100,255,0.12); margin: 14px 0; }
+
+.empty-state { color: rgba(200,180,255,0.4); text-align: center; padding: 24px; font-size: 13px; }
+</style>
+</head>
+<body>
+
+<div class="mlbb-root">
+  <div class="mlbb-bg"></div>
+
+  <div class="mlbb-header">
+    <div class="mlbb-logo">MLBB <span>STATS</span></div>
+    <div class="mlbb-badge">UNOFFICIAL</div>
+  </div>
+
+  <div class="mlbb-body" id="app-body">
+
+    <!-- STEP 1: Input UID + Zone -->
+    <div id="step1">
+      <div class="step-bar">
+        <div class="step-dot active"></div>
+        <div class="step-dot"></div>
+        <div class="step-dot"></div>
+      </div>
+      <div class="info-box">
+        <strong style="color:#00e5c8">Cara login:</strong><br>
+        Masukkan <strong>User ID</strong> dan <strong>Zone ID</strong> akun MLBB kamu, lalu klik Kirim Kode. Kode verifikasi akan dikirim ke inbox in-game kamu (berlaku 5 menit).
+      </div>
+      <div class="form-group">
+        <label class="form-label">User ID</label>
+        <input class="mlbb-input" id="inp-uid" type="text" placeholder="Contoh: 281012478" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Zone ID / Server</label>
+        <input class="mlbb-input" id="inp-zone" type="text" placeholder="Contoh: 9463" />
+      </div>
+      <div class="warn-box">
+        Zone ID ada di profil in-game kamu dalam tanda kurung setelah User ID.<br>
+        Contoh: <strong>281012478(9463)</strong> → Zone ID = <strong>9463</strong>
+      </div>
+      <button class="mlbb-btn" id="btn-send-vc" onclick="sendVC()">Kirim Kode Verifikasi</button>
+      <div id="err1" class="err-box"></div>
+    </div>
+
+    <!-- STEP 2: Input VC -->
+    <div id="step2" style="display:none">
+      <div class="step-bar">
+        <div class="step-dot done"></div>
+        <div class="step-dot active"></div>
+        <div class="step-dot"></div>
+      </div>
+      <div class="info-box">
+        Kode sudah dikirim ke <strong>inbox in-game</strong> kamu.<br>
+        Buka MLBB → Pesan → cari pesan sistem → salin kodenya.
+      </div>
+      <div class="form-group">
+        <label class="form-label">Kode Verifikasi (6 digit)</label>
+        <div class="vc-input-row">
+          <input class="mlbb-input" id="inp-vc" type="text" maxlength="6" placeholder="------" oninput="this.value=this.value.replace(/\D/g,'')" />
+        </div>
+        <div class="timer-text" id="timer-txt">⏱ Kode berlaku selama <span id="timer-count">300</span> detik</div>
+      </div>
+      <button class="mlbb-btn" id="btn-login" onclick="doLogin()">Masuk & Lihat Stats</button>
+      <button class="mlbb-btn mlbb-btn-outline" style="margin-top:8px" onclick="backToStep1()">← Ganti Akun</button>
+      <div id="err2" class="err-box"></div>
+    </div>
+
+    <!-- STEP 3: Dashboard -->
+    <div id="step3" style="display:none">
+      <button class="signout-btn" onclick="signOut()">Keluar ↩</button>
+      <div class="step-bar">
+        <div class="step-dot done"></div>
+        <div class="step-dot done"></div>
+        <div class="step-dot done"></div>
+      </div>
+
+      <div class="player-card">
+        <div class="player-avatar" id="p-avatar">?</div>
+        <div>
+          <p class="player-name" id="p-name">—</p>
+          <p class="player-id" id="p-uid-disp">ID: —</p>
+        </div>
+        <div class="rank-badge">
+          <span class="rank-label">RANK</span>
+          <span class="rank-name" id="p-rank">—</span>
+        </div>
+      </div>
+
+      <div class="tab-bar">
+        <div class="tab-btn active" onclick="showTab('overview')">Overview</div>
+        <div class="tab-btn" onclick="showTab('matches')">Recent Matches</div>
+        <div class="tab-btn" onclick="showTab('heroes')">Top Heroes</div>
+      </div>
+
+      <!-- Tab Overview -->
+      <div class="tab-content active" id="tab-overview">
+        <div class="stats-grid">
+          <div class="stat-card"><span class="stat-val green" id="s-winrate">—</span><span class="stat-lbl">Win Rate</span></div>
+          <div class="stat-card"><span class="stat-val amber" id="s-avgscore">—</span><span class="stat-lbl">Avg. Score</span></div>
+          <div class="stat-card"><span class="stat-val" id="s-mvprate">—</span><span class="stat-lbl">MVP Rate</span></div>
+          <div class="stat-card"><span class="stat-val" id="s-matches">—</span><span class="stat-lbl">Total Matches</span></div>
+          <div class="stat-card"><span class="stat-val" id="s-playtime">—</span><span class="stat-lbl">Play Time</span></div>
+          <div class="stat-card"><span class="stat-val green" id="s-streak">—</span><span class="stat-lbl">Max Win Streak</span></div>
+        </div>
+        <hr class="divider">
+        <div class="section-title">Record Terbaik</div>
+        <div class="stats-grid">
+          <div class="stat-card"><span class="stat-val amber" id="r-kills">—</span><span class="stat-lbl">Most Kills</span></div>
+          <div class="stat-card"><span class="stat-val" id="r-dmg">—</span><span class="stat-lbl">Highest DMG</span></div>
+          <div class="stat-card"><span class="stat-val green" id="r-assist">—</span><span class="stat-lbl">Most Assist</span></div>
+        </div>
+      </div>
+
+      <!-- Tab Matches -->
+      <div class="tab-content" id="tab-matches">
+        <div id="match-list"></div>
+        <button class="mlbb-btn mlbb-btn-outline mlbb-btn-sm" style="margin-top:4px" onclick="loadMoreMatches()">Muat lebih banyak ↓</button>
+      </div>
+
+      <!-- Tab Heroes -->
+      <div class="tab-content" id="tab-heroes">
+        <div id="hero-list"></div>
+      </div>
+
+      <div id="err3" class="err-box"></div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+const BASE = 'https://mlbb.rone.dev/api';
+let jwt = null, uid = '', zone = '', timerInterval = null, matchOffset = 0;
+const heroIcons = ['🗡️','🏹','🔮','⚔️','🛡️','⚡','🌊','🔥','❄️','🌿'];
+const rankNames = {1:'Warrior',2:'Elite',3:'Master',4:'Grandmaster',5:'Epic',6:'Legend',7:'Mythic',8:'Mythical Glory'};
+
+function el(id) { return document.getElementById(id); }
+function show(id) { el(id).style.display = ''; }
+function hide(id) { el(id).style.display = 'none'; }
+function setErr(id, msg) { el(id).innerHTML = msg; el(id).style.display = 'block'; }
+function clearErr(id) { el(id).style.display = 'none'; }
+
+async function post(path, body, token=null) {
+  const h = {'Content-Type':'application/json'};
+  if (token) h['Authorization'] = 'Bearer ' + token;
+  const r = await fetch(BASE + path, {method:'POST', headers:h, body:JSON.stringify(body)});
+  const d = await r.json();
+  if (!r.ok) throw new Error(d.detail || d.message || JSON.stringify(d));
+  return d;
+}
+
+async function sendVC() {
+  uid = el('inp-uid').value.trim();
+  zone = el('inp-zone').value.trim();
+  if (!uid || !zone) { setErr('err1','⚠ Masukkan User ID dan Zone ID terlebih dahulu.'); return; }
+  clearErr('err1');
+  const btn = el('btn-send-vc');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span>Mengirim kode...';
+  try {
+    await post('/user/auth/send-vc', {user_id: uid, zone_id: zone});
+    hide('step1'); show('step2');
+    startTimer();
+  } catch(e) {
+    setErr('err1', '❌ Gagal mengirim kode: ' + e.message + '<br><small>Pastikan User ID dan Zone ID benar.</small>');
+  }
+  btn.disabled = false;
+  btn.innerHTML = 'Kirim Kode Verifikasi';
+}
+
+function startTimer() {
+  let t = 300;
+  el('timer-count').textContent = t;
+  if (timerInterval) clearInterval(timerInterval);
+  timerInterval = setInterval(() => {
+    t--;
+    if (el('timer-count')) el('timer-count').textContent = t;
+    if (t <= 0) { clearInterval(timerInterval); el('timer-txt').textContent = '⚠ Kode sudah kedaluwarsa. Kembali dan kirim ulang.'; }
+  }, 1000);
+}
+
+async function doLogin() {
+  const vc = el('inp-vc').value.trim();
+  if (!vc || vc.length < 4) { setErr('err2','⚠ Masukkan kode verifikasi yang valid.'); return; }
+  clearErr('err2');
+  const btn = el('btn-login');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span>Masuk...';
+  try {
+    const res = await post('/user/auth/login', {user_id: uid, zone_id: zone, vc: vc});
+    jwt = res.token || res.access_token || res.jwt;
+    if (!jwt) throw new Error('Token tidak ditemukan di respons.');
+    if (timerInterval) clearInterval(timerInterval);
+    hide('step2');
+    await loadDashboard();
+    show('step3');
+  } catch(e) {
+    setErr('err2', '❌ Login gagal: ' + e.message + '<br><small>Pastikan kode yang dimasukkan benar dan belum kedaluwarsa.</small>');
+  }
+  btn.disabled = false;
+  btn.innerHTML = 'Masuk & Lihat Stats';
+}
+
+async function loadDashboard() {
+  await Promise.all([loadUserInfo(), loadStats(), loadMatches(true), loadHeroes()]);
+}
+
+async function loadUserInfo() {
+  try {
+    const d = await post('/user/info', {user_id: uid, zone_id: zone}, jwt);
+    const u = d.data || d;
+    el('p-name').textContent = u.nickname || u.name || 'Pemain';
+    el('p-avatar').textContent = (u.nickname||u.name||'P')[0].toUpperCase();
+    el('p-uid-disp').textContent = 'ID: ' + uid + '(' + zone + ')';
+    const rankId = u.rank_id || u.rankId;
+    el('p-rank').textContent = rankNames[rankId] || (u.rank_name || '?');
+  } catch(e) {
+    el('p-name').textContent = 'Pemain';
+    el('p-avatar').textContent = 'P';
+    el('p-uid-disp').textContent = 'ID: ' + uid + '(' + zone + ')';
+    el('p-rank').textContent = '?';
+  }
+}
+
+async function loadStats() {
+  try {
+    const d = await post('/user/stats', {user_id: uid, zone_id: zone}, jwt);
+    const s = d.data || d;
+    el('s-winrate').textContent = (s.win_rate ?? s.winRate ?? '—') + '%';
+    el('s-avgscore').textContent = s.avg_score ?? s.avgScore ?? '—';
+    el('s-mvprate').textContent = (s.mvp_rate ?? s.mvpRate ?? '—') + '%';
+    el('s-matches').textContent = Number(s.total_matches ?? s.totalMatches ?? 0).toLocaleString();
+    const pt = s.play_time ?? s.playTime;
+    el('s-playtime').textContent = pt ? Math.round(pt/3600) + 'H' : '—';
+    el('s-streak').textContent = s.max_win_streak ?? s.maxWinStreak ?? '—';
+    el('r-kills').textContent = s.most_kills ?? s.mostKills ?? '—';
+    const dmg = s.highest_damage ?? s.highestDamage ?? s.highest_dmg;
+    el('r-dmg').textContent = dmg ? Number(dmg).toLocaleString() : '—';
+    el('r-assist').textContent = s.most_assists ?? s.mostAssists ?? '—';
+  } catch(e) {
+    setErr('err3', 'Stats tidak dapat dimuat: ' + e.message);
+  }
+}
+
+async function loadMatches(fresh=false) {
+  if (fresh) matchOffset = 0;
+  try {
+    const d = await post('/user/matches', {user_id: uid, zone_id: zone, offset: matchOffset, limit: 10}, jwt);
+    const matches = d.data || d.matches || d || [];
+    const list = el('match-list');
+    if (fresh) list.innerHTML = '';
+    const arr = Array.isArray(matches) ? matches : [];
+    if (arr.length === 0 && fresh) {
+      list.innerHTML = '<div class="empty-state">Belum ada data match</div>';
+      return;
+    }
+    arr.forEach((m, i) => {
+      const win = m.is_win ?? m.isWin ?? m.win ?? (m.result === 'win');
+      const hero = m.hero_name ?? m.heroName ?? m.hero ?? 'Hero';
+      const k = m.kills ?? m.kill ?? 0;
+      const de = m.deaths ?? m.death ?? 0;
+      const a = m.assists ?? m.assist ?? 0;
+      const score = m.score ? Number(m.score).toFixed(1) : '—';
+      const date = m.match_time ?? m.matchTime ?? m.date ?? '';
+      const icon = heroIcons[(k + de + a + i) % heroIcons.length];
+      list.innerHTML += `<div class="match-row">
+        <div class="match-hero-icon">${icon}</div>
+        <div style="flex:1;min-width:0">
+          <div class="match-hero-name">${hero}</div>
+          <div class="match-kda">${k}/${de}/${a} KDA</div>
+        </div>
+        <span class="match-score">${score}</span>
+        <span class="win-badge ${win?'win':'lose'}">${win?'WIN':'LOSE'}</span>
+        <span class="match-date">${date ? String(date).slice(0,10) : ''}</span>
+      </div>`;
+    });
+    matchOffset += arr.length;
+  } catch(e) {
+    setErr('err3', 'Match history tidak dapat dimuat: ' + e.message);
+  }
+}
+
+async function loadHeroes() {
+  try {
+    const d = await post('/user/heroes/frequent', {user_id: uid, zone_id: zone, limit: 8}, jwt);
+    const heroes = d.data || d.heroes || d || [];
+    const list = el('hero-list');
+    list.innerHTML = '';
+    const arr = Array.isArray(heroes) ? heroes : [];
+    if (arr.length === 0) { list.innerHTML = '<div class="empty-state">Belum ada data hero</div>'; return; }
+    arr.forEach((h, i) => {
+      const name = h.hero_name ?? h.heroName ?? h.name ?? 'Hero';
+      const wr = h.win_rate ?? h.winRate;
+      const matches = h.matches ?? h.match_count ?? h.total ?? '—';
+      const icon = heroIcons[i % heroIcons.length];
+      list.innerHTML += `<div class="match-row">
+        <div class="match-hero-icon">${icon}</div>
+        <div style="flex:1">
+          <div class="match-hero-name">${name}</div>
+          <div class="match-kda">${matches} matches</div>
+        </div>
+        <span class="match-score" style="color:#00e5c8">${wr !== undefined ? Number(wr).toFixed(1)+'%' : '—'}</span>
+        <span class="match-date">WR</span>
+      </div>`;
+    });
+  } catch(e) {
+    el('hero-list').innerHTML = '<div style="color:rgba(255,150,150,0.7);font-size:13px;padding:10px">Gagal memuat data hero: ' + e.message + '</div>';
+  }
+}
+
+function loadMoreMatches() { loadMatches(false); }
+
+function showTab(name) {
+  document.querySelectorAll('.tab-btn').forEach((b,i) => {
+    const names = ['overview','matches','heroes'];
+    b.classList.toggle('active', names[i] === name);
+  });
+  document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+  el('tab-'+name).classList.add('active');
+}
+
+function backToStep1() {
+  hide('step2'); show('step1');
+  if (timerInterval) clearInterval(timerInterval);
+  clearErr('err1'); clearErr('err2');
+}
+
+function signOut() {
+  jwt = null; uid = ''; zone = '';
+  hide('step3'); show('step1');
+  el('inp-uid').value = ''; el('inp-zone').value = ''; el('inp-vc').value = '';
+  el('match-list').innerHTML = ''; el('hero-list').innerHTML = '';
+  clearErr('err1'); clearErr('err3');
+  if (timerInterval) clearInterval(timerInterval);
+}
+</script>
+
+</body>
+</html>
